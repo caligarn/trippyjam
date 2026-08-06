@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Open Line</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* printed psychedelia, not neon. oxidised inks on warm stock. */
+    --field:#170E22;
+    --field-2:#22143180;
+    --line:#4A2E5E;
+    --paper:#FFEBC7;
+    --dim:#B49BC8;
+    --signal:#FF2E88;
+    --mask:#8CFF4A;
+    --marigold:#FFB020;
+    --cyan:#2FE3E3;
+    --oxide:#E4572E;
+
+    --display:"Bricolage Grotesque","Helvetica Neue",Helvetica,Arial,sans-serif;
+    --body:"Instrument Sans",ui-sans-serif,system-ui,-apple-system,sans-serif;
+    --mono:"DM Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+
+  html,body{height:100%}
+
+  body{
+    background:var(--field);
+    color:var(--paper);
+    font-family:var(--body);
+    font-size:16px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    display:flex;
+    justify-content:center;
+    padding:clamp(20px,5vw,56px) clamp(18px,5vw,32px) 64px;
+  }
+
+  /* riso grain, sits over everything */
+  body::after{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:3;
+    opacity:.22;
+    mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* four inks bleeding into each other, slowly, like wet offset */
+  .aurora{
+    position:fixed;
+    inset:-25%;
+    z-index:0;
+    pointer-events:none;
+    filter:blur(70px);
+    opacity:.5;
+  }
+  .aurora i{
+    position:absolute;
+    display:block;
+    border-radius:50%;
+    mix-blend-mode:screen;
+  }
+  .aurora i:nth-child(1){width:56vmax;height:56vmax;left:-8%;top:-4%;
+    background:radial-gradient(circle,#FF2E88,transparent 66%);animation:drift1 34s ease-in-out infinite}
+  .aurora i:nth-child(2){width:50vmax;height:50vmax;right:-10%;top:8%;
+    background:radial-gradient(circle,#2FE3E3,transparent 64%);animation:drift2 41s ease-in-out infinite}
+  .aurora i:nth-child(3){width:62vmax;height:62vmax;left:12%;bottom:-16%;
+    background:radial-gradient(circle,#8CFF4A,transparent 62%);animation:drift3 47s ease-in-out infinite}
+  .aurora i:nth-child(4){width:44vmax;height:44vmax;right:4%;bottom:-4%;
+    background:radial-gradient(circle,#FFB020,transparent 66%);animation:drift1 38s ease-in-out infinite reverse}
+
+  @keyframes drift1{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(12vw,8vh) scale(1.18)}66%{transform:translate(-6vw,14vh) scale(.9)}}
+  @keyframes drift2{0%,100%{transform:translate(0,0) scale(1.05)}50%{transform:translate(-14vw,10vh) scale(.85)}}
+  @keyframes drift3{0%,100%{transform:translate(0,0) scale(.95)}40%{transform:translate(10vw,-10vh) scale(1.2)}75%{transform:translate(-8vw,-4vh) scale(1)}}
+
+  .shell{
+    position:relative;
+    z-index:2;
+    width:100%;
+    max-width:560px;
+    display:flex;
+    flex-direction:column;
+    gap:clamp(28px,5vw,40px);
+  }
+
+  /* ---------- masthead ---------- */
+
+  .masthead{display:flex;flex-direction:column;gap:18px}
+
+  .strip{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--dim);
+  }
+  .strip .rule{flex:1;height:1px;background:var(--line)}
+
+  .lamp{
+    width:7px;height:7px;border-radius:50%;
+    background:var(--line);
+    transition:background .3s, box-shadow .3s;
+  }
+  body[data-step="recording"] .lamp{background:var(--signal);box-shadow:0 0 10px var(--signal);animation:pulse 1.15s ease-in-out infinite}
+  body[data-step="review"] .lamp,
+  body[data-step="sent"] .lamp{background:var(--mask);box-shadow:0 0 10px var(--mask)}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+  h1{
+    font-family:var(--display);
+    font-weight:800;
+    font-size:clamp(34px,8.5vw,54px);
+    line-height:1.02;
+    letter-spacing:-.028em;
+    text-wrap:balance;
+    /* plates that never quite line up */
+    text-shadow:
+      .022em .018em 0 rgba(255,46,136,.85),
+      -.02em -.014em 0 rgba(47,227,227,.75),
+      .006em -.024em 0 rgba(255,176,32,.55);
+  }
+  h1 .turn{display:block;color:var(--marigold);text-shadow:
+      .022em .018em 0 rgba(140,255,74,.7),
+      -.02em -.014em 0 rgba(255,46,136,.6);}
+
+  .standfirst{
+    color:var(--dim);
+    font-size:clamp(15px,3.6vw,17px);
+    max-width:44ch;
+  }
+  .standfirst strong{color:var(--paper);font-weight:500}
+
+  .prompts{
+    list-style:none;
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+    padding-left:2px;
+  }
+  .prompts li{
+    position:relative;
+    padding-left:20px;
+    font-size:14.5px;
+    color:var(--dim);
+  }
+  .prompts li::before{
+    content:"";
+    position:absolute;
+    left:0;
+    top:.6em;
+    width:8px;height:8px;
+    border-radius:50%;
+  }
+  .prompts li:nth-child(1)::before{background:#FF2E88}
+  .prompts li:nth-child(2)::before{background:#FFB020}
+  .prompts li:nth-child(3)::before{background:#8CFF4A}
+  .prompts li:nth-child(4)::before{background:#2FE3E3}
+
+  .caution{
+    font-family:var(--mono);
+    font-size:11.5px;
+    letter-spacing:.05em;
+    color:#8E76A4;
+  }
+
+  .pact{
+    border-left:2px solid transparent;
+    border-image:linear-gradient(180deg,#FF2E88,#FFB020 34%,#8CFF4A 68%,#2FE3E3) 1;
+    padding:2px 0 2px 16px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .pact h2{
+    font-family:var(--mono);
+    font-size:11px;
+    font-weight:500;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--marigold);
+  }
+  .pact p,.lineage p{
+    font-size:14.5px;
+    color:var(--dim);
+    max-width:46ch;
+  }
+  .lineage{
+    border-left:2px solid transparent;
+    border-image:linear-gradient(180deg,#2FE3E3,#9B4DFF 55%,#FF2E88) 1;
+    padding:2px 0 2px 16px;
+    display:flex;flex-direction:column;gap:10px;
+  }
+  .lineage h2{
+    font-family:var(--mono);
+    font-size:11px;font-weight:500;
+    letter-spacing:.14em;text-transform:uppercase;
+    color:var(--cyan);
+  }
+  .lineage em{color:var(--paper);font-style:italic}
+
+  /* ---------- lineage plates ---------- */
+
+  .plates{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:18px;
+  }
+  @media (max-width:460px){ .plates{grid-template-columns:1fr} }
+
+  .plate{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .frame{
+    position:relative;
+    border:1px solid var(--line);
+    border-radius:2px;
+    overflow:hidden;
+  }
+  .plate svg{
+    display:block;
+    width:100%;
+    height:auto;
+    filter:saturate(1.05) contrast(1.03);
+  }
+  /* drop a file at the matching path and it covers the plate.
+     no file, no broken icon: the plate below just shows through. */
+  .frame img{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .plate h3{
+    font-family:var(--display);
+    font-weight:700;
+    font-size:16px;
+    letter-spacing:-.01em;
+    color:var(--paper);
+  }
+  .plate .meta{
+    font-family:var(--mono);
+    font-size:10.5px;
+    letter-spacing:.11em;
+    text-transform:uppercase;
+    color:var(--marigold);
+    margin-top:1px;
+  }
+  .plate figcaption p:last-child{
+    font-size:13.5px;
+    line-height:1.5;
+    color:var(--dim);
+    margin-top:6px;
+  }
+
+
+  /* ---------- console ---------- */
+
+  .console{
+    border:1px solid var(--line);
+    background:linear-gradient(180deg,rgba(34,20,49,.86),rgba(23,14,34,.92));
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    border-radius:3px;
+    overflow:hidden;
+    box-shadow:0 0 0 1px rgba(255,46,136,.14), 0 24px 70px -30px rgba(255,46,136,.5);
+  }
+
+  .console-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    padding:12px 16px;
+    border-bottom:1px solid var(--line);
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+  }
+  #stateLabel{color:var(--dim)}
+  #clock{color:var(--paper);font-variant-numeric:tabular-nums}
+  body[data-step="recording"] #clock{color:var(--signal)}
+  body[data-step="recording"] #clock.warn{animation:pulse .6s ease-in-out infinite}
+
+  /* the signature: the waveform that stops being yours */
+  .scope{
+    display:block;
+    width:100%;
+    height:140px;
+    background:
+      radial-gradient(130% 150% at 50% 50%,rgba(255,46,136,.08),transparent 64%),
+      rgba(12,6,20,.55);
+  }
+
+  .console-foot{
+    padding:16px;
+    border-top:1px solid var(--line);
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+
+  .hint{
+    font-family:var(--mono);
+    font-size:11.5px;
+    letter-spacing:.04em;
+    color:var(--dim);
+    min-height:1.5em;
+  }
+  .hint.alert{color:var(--signal)}
+
+  /* ---------- controls ---------- */
+
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  .row > *{flex:1 1 140px}
+
+  button{
+    font-family:var(--body);
+    font-size:15px;
+    font-weight:500;
+    color:var(--paper);
+    background:transparent;
+    border:1px solid var(--line);
+    border-radius:2px;
+    padding:14px 18px;
+    cursor:pointer;
+    transition:background .16s,border-color .16s,color .16s,opacity .16s;
+  }
+  button:hover:not(:disabled){background:rgba(255,255,255,.05);border-color:var(--dim)}
+  button:focus-visible{outline:2px solid var(--marigold);outline-offset:2px}
+  button:disabled{opacity:.35;cursor:not-allowed}
+
+  .btn-rec{
+    border-color:var(--signal);
+    color:var(--signal);
+    display:flex;align-items:center;justify-content:center;gap:10px;
+  }
+  .btn-rec:hover:not(:disabled){background:rgba(255,68,56,.1)}
+  .btn-rec .dot{width:9px;height:9px;border-radius:50%;background:var(--signal)}
+
+  .btn-go{
+    background:linear-gradient(96deg,var(--marigold),var(--signal) 46%,#9B4DFF 78%,var(--cyan));
+    border-color:transparent;
+    color:#160B20;
+    font-weight:700;
+    letter-spacing:.01em;
+  }
+  .btn-go:hover:not(:disabled){filter:brightness(1.12) saturate(1.1)}
+
+  .btn-quiet{color:var(--dim)}
+
+  .linkbtn{
+    display:block;
+    text-align:center;
+    text-decoration:none;
+    font-family:var(--body);
+    font-size:15px;
+    font-weight:500;
+    color:var(--paper);
+    border:1px solid var(--line);
+    border-radius:2px;
+    padding:14px 18px;
+    transition:background .16s,border-color .16s;
+  }
+  .linkbtn:hover{background:rgba(255,255,255,.05);border-color:var(--dim)}
+  .linkbtn:focus-visible{outline:2px solid var(--marigold);outline-offset:2px}
+
+  /* voice picker */
+  .voices{display:flex;flex-wrap:wrap;gap:8px}
+  .voice{
+    flex:0 0 auto;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    padding:8px 12px;
+    color:var(--dim);
+  }
+  .voice{border-color:rgba(180,155,200,.28)}
+  .voice:nth-child(1){--vc:#FF2E88}
+  .voice:nth-child(2){--vc:#FFB020}
+  .voice:nth-child(3){--vc:#2FE3E3}
+  .voice:nth-child(4){--vc:#8CFF4A}
+  .voice[aria-pressed="true"]{
+    color:var(--vc);
+    border-color:var(--vc);
+    background:color-mix(in srgb,var(--vc) 14%,transparent);
+    box-shadow:0 0 20px -6px var(--vc);
+  }
+
+  /* ---------- text fallback ---------- */
+
+  .alt{
+    border-top:1px solid var(--line);
+    padding-top:20px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .alt-toggle{
+    align-self:flex-start;
+    background:none;border:none;padding:0;
+    color:var(--dim);
+    font-size:14px;
+    text-decoration:underline;
+    text-underline-offset:4px;
+    text-decoration-color:var(--line);
+  }
+  .alt-toggle:hover{color:var(--paper);background:none}
+
+  textarea{
+    width:100%;
+    min-height:150px;
+    resize:vertical;
+    background:rgba(12,6,20,.5);
+    border:1px solid var(--line);
+    border-radius:2px;
+    color:var(--paper);
+    font-family:var(--body);
+    font-size:15px;
+    line-height:1.6;
+    padding:14px;
+  }
+  textarea:focus{outline:none;border-color:var(--signal)}
+  textarea::placeholder{color:#57707E}
+
+  /* ---------- receipt ---------- */
+
+  .receipt{
+    border:1px solid transparent;
+    border-image:linear-gradient(122deg,#FF2E88,#FFB020 36%,#8CFF4A 70%,#2FE3E3) 1;
+    background:rgba(34,20,49,.7);
+    backdrop-filter:blur(14px);
+    border-radius:3px;
+    padding:22px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .receipt h2{
+    font-family:var(--display);
+    font-weight:700;
+    font-size:24px;
+    letter-spacing:-.02em;
+  }
+  .receipt p{color:var(--dim);font-size:15px}
+  .receipt .id{
+    font-family:var(--mono);
+    font-size:15px;
+    letter-spacing:.22em;
+    color:var(--marigold);
+  }
+
+  a{color:var(--cyan);text-underline-offset:3px}
+
+  .colophon{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.08em;
+    color:#8E76A4;
+    line-height:1.9;
+  }
+
+  [hidden]{display:none !important}
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none !important;transition:none !important}
+    .aurora{opacity:.38}
+  }
+</style>
+</head>
+<body data-step="idle">
+
+<div class="aurora" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+
+<main class="shell">
+
+  <header class="masthead">
+    <div class="strip">
+      <span class="lamp" aria-hidden="true"></span>
+      <span>Machine Cinema</span>
+      <span class="rule" aria-hidden="true"></span>
+      <span id="stripStatus">No one is listening yet</span>
+    </div>
+
+    <h1>Tell us what happened.<span class="turn">In a voice that isn't yours.</span></h1>
+
+    <p class="standfirst">
+      We're collecting what people actually went through with plant medicine.
+      Ridiculous, tender, frightening, still unresolved. All of it counts, and it
+      does not have to arrive as a tidy story. Record yours, we'll change how you
+      sound, and <strong>you listen back before anything sends.</strong>
+    </p>
+
+    <ul class="prompts">
+      <li>The thing you said out loud that you cannot take back</li>
+      <li>Something you understood for the first time</li>
+      <li>A moment you have never managed to describe properly</li>
+      <li>What you were actually afraid of</li>
+    </ul>
+
+    <div class="pact">
+      <h2>What happens to it</h2>
+      <p>
+        Open Line is run by the Machine Cinema community. Your recording becomes
+        a short film, built at a GenJam: a room full of people animating to a voice
+        they have never heard before, in a few hours, together. Your masked voice
+        is the only version anyone works from. The original audio is never uploaded
+        and we never learn who you are.
+      </p>
+      <p>
+        Every submission gets a reference code. Keep it and you can have your story
+        pulled at any point, no questions and no explanation needed.
+      </p>
+    </div>
+
+    <div class="lineage">
+      <h2>What we're chasing</h2>
+      <p>
+        Four things do the trick we're after: somebody talks plainly about
+        something enormous while the picture goes somewhere the words cannot
+        follow. These are the plates we're printing from.
+      </p>
+    </div>
+
+    <div class="plates">
+
+      <figure class="plate">
+        <div class="frame">
+        <svg viewBox="0 0 320 200" role="img" aria-label="Ochre and oxblood ripple field">
+          <defs>
+            <filter id="rip1"><feTurbulence type="fractalNoise" baseFrequency=".012 .09" numOctaves="3" seed="7"/>
+              <feDisplacementMap in="SourceGraphic" scale="34" xChannelSelector="R" yChannelSelector="G"/></filter>
+          </defs>
+          <rect width="320" height="200" fill="#D9C289"/>
+          <g filter="url(#rip1)">
+            <rect y="-20" width="320" height="30" fill="#7A2029"/>
+            <rect y="26" width="320" height="22" fill="#1A1410"/>
+            <rect y="62" width="320" height="26" fill="#E8C84A"/>
+            <rect y="102" width="320" height="20" fill="#6B7A34"/>
+            <rect y="136" width="320" height="28" fill="#7A2029"/>
+            <rect y="180" width="320" height="40" fill="#A8BEDF"/>
+          </g>
+        </svg>
+          <img src="lineage/fantastic-planet.png" alt="Fantastic Planet" loading="lazy" onerror="this.remove()">
+        </div>
+        <figcaption>
+          <h3>Fantastic Planet</h3>
+          <p class="meta">Laloux &amp; Topor, 1973 &middot; Les Films Armorial</p>
+          <p>Flat, patient, matte. Nothing glows. The strangeness is in the drawing, not the lighting.</p>
+        </figcaption>
+      </figure>
+
+      <figure class="plate">
+        <div class="frame">
+        <svg viewBox="0 0 320 200" role="img" aria-label="Scarlet spiral on black">
+          <rect width="320" height="200" fill="#0A0A0A"/>
+          <path d="M160 100 m0,-6 a6,6 0 1,1 -6,6 a14,14 0 1,0 14,-14 a26,26 0 1,1 -26,26 a42,42 0 1,0 42,-42 a62,62 0 1,1 -62,62 a86,86 0 1,0 86,-86 a112,112 0 1,1 -112,112"
+                fill="none" stroke="#C81E20" stroke-width="13" stroke-linecap="round"/>
+          <circle cx="58" cy="42" r="16" fill="#F5CE2B"/>
+          <circle cx="268" cy="66" r="11" fill="#F5CE2B"/>
+          <circle cx="96" cy="168" r="9" fill="#F5CE2B"/>
+          <circle cx="238" cy="158" r="14" fill="#F5CE2B"/>
+        </svg>
+          <img src="lineage/simpsons-chili.png" alt="The chili episode" loading="lazy" onerror="this.remove()">
+        </div>
+        <figcaption>
+          <h3>The chili episode</h3>
+          <p class="meta">The Simpsons, 1997 &middot; 20th Television</p>
+          <p>Comedy is the doorway, not the destination. It gets to loneliness by way of a laugh.</p>
+        </figcaption>
+      </figure>
+
+      <figure class="plate">
+        <div class="frame">
+        <svg viewBox="0 0 320 200" role="img" aria-label="Overcast field with a single glow">
+          <defs>
+            <linearGradient id="sky3" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#9DAFBC"/><stop offset="1" stop-color="#C3CBCE"/>
+            </linearGradient>
+            <radialGradient id="glo3"><stop offset="0" stop-color="#7FE6FF"/><stop offset="1" stop-color="#3BC4E8" stop-opacity="0"/></radialGradient>
+          </defs>
+          <rect width="320" height="200" fill="url(#sky3)"/>
+          <path d="M0 132 Q80 118 160 128 T320 122 L320 200 L0 200Z" fill="#4A7A3A"/>
+          <path d="M0 152 Q90 140 170 150 T320 146 L320 200 L0 200Z" fill="#3B6430"/>
+          <circle cx="196" cy="140" r="42" fill="url(#glo3)"/>
+          <g fill="#3BC4E8">
+            <ellipse cx="196" cy="136" rx="9" ry="6"/><rect x="194.5" y="136" width="3" height="16" rx="1.5"/>
+            <ellipse cx="182" cy="144" rx="6" ry="4"/><rect x="181" y="144" width="2" height="11" rx="1"/>
+            <ellipse cx="209" cy="145" rx="7" ry="4.5"/><rect x="208" y="145" width="2" height="10" rx="1"/>
+          </g>
+        </svg>
+          <img src="lineage/common-side-effects.png" alt="Common Side Effects" loading="lazy" onerror="this.remove()">
+        </div>
+        <figcaption>
+          <h3>Common Side Effects</h3>
+          <p class="meta">Adult Swim, 2025 &middot; Warner Bros. Discovery</p>
+          <p>Muted, overcast, faintly unwell. Proof this register does not have to be pretty to land.</p>
+        </figcaption>
+      </figure>
+
+      <figure class="plate">
+        <div class="frame">
+        <svg viewBox="0 0 320 200" role="img" aria-label="Candy coloured landscape with a rainbow arc">
+          <defs>
+            <linearGradient id="grd4" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#F2A0A8"/><stop offset="1" stop-color="#E8858F"/>
+            </linearGradient>
+          </defs>
+          <rect width="320" height="200" fill="url(#grd4)"/>
+          <g fill="none" stroke-width="7">
+            <path d="M28 150 A70 70 0 0 1 168 150" stroke="#FF5E9C"/>
+            <path d="M39 150 A59 59 0 0 1 157 150" stroke="#FFB020"/>
+            <path d="M50 150 A48 48 0 0 1 146 150" stroke="#8CFF4A"/>
+            <path d="M61 150 A37 37 0 0 1 135 150" stroke="#3FD9C9"/>
+          </g>
+          <path d="M180 150 q22-64 52-64 t54 64Z" fill="#B04FD8"/>
+          <path d="M232 150 q26-44 48-44 t40 44Z" fill="#7E36AC"/>
+          <path d="M0 150 q30-30 58-30 t50 30Z" fill="#3FD9C9"/>
+          <rect y="150" width="320" height="50" fill="#D96B85"/>
+          <circle cx="256" cy="104" r="13" fill="#FFF6E2"/><circle cx="256" cy="104" r="5" fill="#141018"/>
+        </svg>
+          <img src="lineage/midnight-gospel.png" alt="The Midnight Gospel" loading="lazy" onerror="this.remove()">
+        </div>
+        <figcaption>
+          <h3>The Midnight Gospel</h3>
+          <p class="meta">Ward &amp; Trussell, 2020 &middot; Netflix</p>
+          <p>The picture never illustrates the audio. It runs alongside it and trusts you to hold both.</p>
+        </figcaption>
+      </figure>
+
+    </div>
+
+    <p class="caution">Leave out names, venues and anything that identifies anyone else.</p>
+
+    <a class="linkbtn" href="gallery.html">Listen to the line so far &rarr;</a>
+  </header>
+
+  <!-- ============ VOICE PATH ============ -->
+  <section id="voicePath">
+    <div class="console">
+      <div class="console-head">
+        <span id="stateLabel">Ready</span>
+        <span id="clock">0:00</span>
+      </div>
+
+      <canvas class="scope" id="scope" aria-label="Audio waveform"></canvas>
+
+      <div class="console-foot">
+        <p class="hint" id="hint">Find somewhere quiet. Up to 90 seconds is plenty.</p>
+
+        <!-- idle -->
+        <div class="row" id="ctlIdle">
+          <button class="btn-rec" id="btnRecord"><span class="dot"></span>Start recording</button>
+        </div>
+
+        <!-- recording -->
+        <div class="row" id="ctlRecording" hidden>
+          <button id="btnStop">Stop</button>
+        </div>
+
+        <!-- review -->
+        <div id="ctlReview" hidden>
+          <div class="voices" id="voices" role="group" aria-label="Choose a voice"></div>
+          <div class="row" style="margin-top:12px">
+            <button id="btnPlay">Play it back</button>
+            <button class="btn-quiet" id="btnRedo">Start over</button>
+          </div>
+          <div class="row" style="margin-top:10px">
+            <button class="btn-go" id="btnSend">Send anonymously</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- text fallback -->
+    <div class="alt" style="margin-top:24px">
+      <button class="alt-toggle" id="altToggle" aria-expanded="false">Rather type it than say it?</button>
+      <div id="altPanel" hidden>
+        <textarea id="story" placeholder="Start anywhere. It does not have to make sense in order."></textarea>
+        <div class="row" style="margin-top:12px">
+          <button class="btn-go" id="btnSendText">Send anonymously</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RECEIPT ============ -->
+  <section class="receipt" id="receipt" hidden>
+    <h2>Got it.</h2>
+    <p id="receiptBody">Your story is with us and your name isn't attached to it.</p>
+    <p class="id" id="receiptId"></p>
+    <p style="font-size:13.5px">Write this down. It is the only way to ask for your story back, and it is the only thing connecting you to it.</p>
+    <div class="row">
+      <button class="btn-quiet" id="btnAnother">Leave another</button>
+      <a class="linkbtn" id="btnSave" download="story.wav" hidden>Save a copy</a>
+      <a class="linkbtn" href="gallery.html">Hear what others left</a>
+    </div>
+  </section>
+
+  <p class="colophon">
+    A Machine Cinema project. Masking runs in your browser.<br>
+    No account, no cookie, no caller ID. We're after the story, not the substance.
+  </p>
+
+</main>
+
+<script>
+/* ============================================================
+   CONFIG
+   ============================================================ */
+
+const CONFIG = {
+  // Set this to your collection endpoint. Left null, the app runs
+  // end to end and hands the file back to you instead of posting.
+  endpoint: null,
+  maxSeconds: 90,
+  workRate: 24000   // everything is processed at 24k. telephone-ish on purpose.
+};
+
+/* Each voice is one or more shifted layers plus a filter character.
+   ratio > 1 raises pitch, < 1 lowers it. Duration is preserved. */
+const VOICES = [
+  { id:'cellar',  name:'Cellar',  layers:[{ratio:0.74, gain:1.0, delay:0}],
+    hp:110, lp:3300, peak:[430, 4.5], drive:0.18, hiss:0.006 },
+  { id:'kite',    name:'Kite',    layers:[{ratio:1.36, gain:1.0, delay:0}],
+    hp:260, lp:4400, peak:[1350, 3.5], drive:0.10, hiss:0.005 },
+  { id:'switch',  name:'Switchboard', layers:[{ratio:0.89, gain:1.0, delay:0}],
+    hp:340, lp:2900, peak:[980, 6], drive:0.34, hiss:0.011 },
+  { id:'crowd',   name:'Crowd',   layers:[{ratio:0.82, gain:0.72, delay:0},
+                                          {ratio:1.21, gain:0.62, delay:0.018}],
+    hp:180, lp:3800, peak:[760, 3], drive:0.14, hiss:0.007 }
+];
+
+/* ============================================================
+   STATE
+   ============================================================ */
+
+const S = {
+  step: 'idle',
+  stream: null,
+  recorder: null,
+  chunks: [],
+  startedAt: 0,
+  tick: null,
+  monoWork: null,     // Float32Array at CONFIG.workRate, the raw voice
+  origLen: 0,
+  voiceIdx: 0,
+  maskedBuffer: null,
+  maskedBlob: null,
+  audioEl: new Audio(),
+  origEnv: null,
+  liveEnv: []
+};
+
+const $ = id => document.getElementById(id);
+
+/* ============================================================
+   SCOPE  (the waveform that stops being yours)
+   ============================================================ */
+
+const scope = $('scope');
+const g2d = scope.getContext('2d');
+let scopeAnim = null;
+/* colour is a spectrum, not a swatch. spread is how far the rainbow
+   opens across the bars: near zero is one hue, high is the full turn. */
+const PAL_REST   = { h:282, spread:0.0, sat:22, lum:34 };
+const PAL_RAW    = { h:334, spread:0.6, sat:94, lum:62 };
+const PAL_MASKED = { h:  8, spread:4.4, sat:90, lum:63 };
+
+let scopeState = { env:null, pal:PAL_REST, spin:0, glow:0 };
+
+function getCSS(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+function fitScope(){
+  const r = scope.getBoundingClientRect();
+  const d = window.devicePixelRatio || 1;
+  scope.width = Math.max(1, Math.round(r.width * d));
+  scope.height = Math.max(1, Math.round(r.height * d));
+  g2d.setTransform(d, 0, 0, d, 0, 0);
+  drawScope();
+}
+window.addEventListener('resize', fitScope);
+
+function barCount(){
+  return Math.max(28, Math.min(80, Math.floor(scope.getBoundingClientRect().width / 7)));
+}
+
+function drawScope(){
+  const w = scope.getBoundingClientRect().width;
+  const h = scope.getBoundingClientRect().height;
+  g2d.clearRect(0, 0, w, h);
+
+  const mid = h / 2;
+  const env = scopeState.env;
+
+  // resting baseline
+  g2d.strokeStyle = getCSS('--line');
+  g2d.lineWidth = 1;
+  g2d.beginPath();
+  g2d.moveTo(0, mid + 0.5);
+  g2d.lineTo(w, mid + 0.5);
+  g2d.stroke();
+
+  if (!env || !env.length) return;
+
+  const n = env.length;
+  const gap = 3;
+  const bw = Math.max(2, (w - gap * (n - 1)) / n);
+
+  const p = scopeState.pal;
+
+  for (let i = 0; i < n; i++){
+    const a = Math.max(0.012, Math.min(1, env[i]));
+    const bh = a * (h * 0.86);
+    const x = i * (bw + gap);
+    const hue = (p.h + i * p.spread * (360 / n) + scopeState.spin) % 360;
+    const col = `hsl(${hue.toFixed(1)} ${p.sat}% ${p.lum}%)`;
+    if (scopeState.glow > 0){
+      g2d.shadowBlur = 16 * scopeState.glow;
+      g2d.shadowColor = col;
+    }
+    g2d.fillStyle = col;
+    g2d.fillRect(x, mid - bh / 2, bw, bh);
+  }
+  g2d.shadowBlur = 0;
+}
+
+function setScope(env, pal, glow, spin){
+  scopeState = { env, pal: pal || PAL_REST, glow: glow || 0, spin: spin || 0 };
+  drawScope();
+}
+
+function lerpPal(a, b, t){
+  return {
+    h: a.h + (b.h - a.h) * t,
+    spread: a.spread + (b.spread - a.spread) * t,
+    sat: a.sat + (b.sat - a.sat) * t,
+    lum: a.lum + (b.lum - a.lum) * t
+  };
+}
+
+/* the mask going on: the envelope scrambles, the hue spins a full turn,
+   and the spectrum opens from one colour into all of them */
+function morphScope(from, to, palFrom, palTo, ms, done){
+  const n = to.length;
+  const a = resample(from || new Float32Array(n), n);
+  const b = to;
+  const t0 = performance.now();
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (reduce){ setScope(b, palTo, .4, 0); done && done(); return; }
+
+  cancelAnimationFrame(scopeAnim);
+  (function frame(now){
+    const t = Math.min(1, (now - t0) / ms);
+    const e = t < .5 ? 2*t*t : 1 - Math.pow(-2*t+2, 2)/2;
+    const chaos = Math.sin(t * Math.PI) * 0.55;
+    const out = new Float32Array(n);
+    for (let i = 0; i < n; i++){
+      const base = a[i] + (b[i] - a[i]) * e;
+      out[i] = Math.max(0.02, base + (Math.random() - 0.5) * chaos * base * 2.4);
+    }
+    setScope(out, lerpPal(palFrom, palTo, e), chaos, 360 * e);
+    if (t < 1) scopeAnim = requestAnimationFrame(frame);
+    else { setScope(b, palTo, .4, 0); done && done(); }
+  })(t0);
+}
+
+function resample(arr, n){
+  const out = new Float32Array(n);
+  if (!arr.length) return out;
+  for (let i = 0; i < n; i++){
+    out[i] = arr[Math.min(arr.length - 1, Math.floor(i * arr.length / n))];
+  }
+  return out;
+}
+
+function envelopeOf(data, n){
+  const out = new Float32Array(n);
+  const per = Math.max(1, Math.floor(data.length / n));
+  let peak = 0;
+  for (let i = 0; i < n; i++){
+    let m = 0;
+    const s = i * per, e = Math.min(data.length, s + per);
+    for (let j = s; j < e; j += 3){ const v = Math.abs(data[j]); if (v > m) m = v; }
+    out[i] = m;
+    if (m > peak) peak = m;
+  }
+  if (peak > 0) for (let i = 0; i < n; i++) out[i] /= peak;
+  return out;
+}
+
+/* ============================================================
+   RECORDING
+   ============================================================ */
+
+function pickMime(){
+  const list = ['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/ogg;codecs=opus'];
+  for (const m of list) if (window.MediaRecorder && MediaRecorder.isTypeSupported(m)) return m;
+  return '';
+}
+
+async function startRecording(){
+  if (!navigator.mediaDevices || !window.MediaRecorder){
+    return fail("This browser can't record audio. Try Chrome, Safari, or Firefox, or type your story instead.");
+  }
+  try {
+    S.stream = await navigator.mediaDevices.getUserMedia({
+      audio:{ echoCancellation:true, noiseSuppression:true, autoGainControl:true }
+    });
+  } catch(e){
+    return fail('Microphone access was blocked. Allow it in your browser settings, or type your story instead.');
+  }
+
+  const mime = pickMime();
+  S.chunks = [];
+  S.recorder = new MediaRecorder(S.stream, mime ? { mimeType: mime } : undefined);
+  S.recorder.ondataavailable = e => { if (e.data.size) S.chunks.push(e.data); };
+  S.recorder.onstop = onRecordingStopped;
+  S.recorder.start();
+
+  // live meter
+  const ac = new (window.AudioContext || window.webkitAudioContext)();
+  const an = ac.createAnalyser();
+  an.fftSize = 1024;
+  ac.createMediaStreamSource(S.stream).connect(an);
+  const buf = new Uint8Array(an.fftSize);
+  S.liveEnv = new Array(barCount()).fill(0.02);
+
+  (function meter(){
+    if (S.step !== 'recording'){ ac.close(); return; }
+    an.getByteTimeDomainData(buf);
+    let peak = 0;
+    for (let i = 0; i < buf.length; i++){
+      const v = Math.abs(buf[i] - 128) / 128;
+      if (v > peak) peak = v;
+    }
+    S.liveEnv.push(Math.min(1, peak * 1.9));
+    while (S.liveEnv.length > barCount()) S.liveEnv.shift();
+    setScope(Float32Array.from(S.liveEnv), PAL_RAW, 0.45, 0);
+    requestAnimationFrame(meter);
+  })();
+
+  S.startedAt = Date.now();
+  setStep('recording');
+  S.tick = setInterval(() => {
+    const s = Math.floor((Date.now() - S.startedAt) / 1000);
+    const left = CONFIG.maxSeconds - s;
+    $('clock').textContent = fmt(s);
+    $('clock').classList.toggle('warn', left <= 10);
+    if (left <= 10 && left > 0) setHint(left + ' seconds left.', true);
+    if (s >= CONFIG.maxSeconds) stopRecording();
+  }, 200);
+}
+
+function stopRecording(){
+  clearInterval(S.tick);
+  if (S.recorder && S.recorder.state !== 'inactive') S.recorder.stop();
+  if (S.stream) S.stream.getTracks().forEach(t => t.stop());
+}
+
+async function onRecordingStopped(){
+  setStep('working');
+  setHint('Changing your voice. This runs here, on your device.');
+
+  const blob = new Blob(S.chunks, { type: S.chunks[0]?.type || 'audio/webm' });
+  try {
+    const ac = new (window.AudioContext || window.webkitAudioContext)();
+    const decoded = await ac.decodeAudioData(await blob.arrayBuffer());
+    await ac.close();
+
+    if (decoded.duration < 0.7){
+      setStep('idle');
+      return fail("That was too short to hear. Give it a few more seconds.");
+    }
+
+    S.monoWork = await toMonoWorkRate(decoded);
+    S.origLen = S.monoWork.length;
+    S.origEnv = envelopeOf(S.monoWork, barCount());
+    setScope(S.origEnv, PAL_RAW, 0.3, 0);
+
+    S.voiceIdx = Math.floor(Math.random() * VOICES.length);
+    await applyVoice(S.voiceIdx, true);
+  } catch(e){
+    console.error(e);
+    setStep('idle');
+    fail("Something went wrong reading that recording. Try once more.");
+  }
+}
+
+/* ============================================================
+   MASKING
+   ============================================================ */
+
+async function toMonoWorkRate(buffer){
+  const sr = CONFIG.workRate;
+  const len = Math.max(1, Math.ceil(buffer.duration * sr));
+  const off = new OfflineAudioContext(1, len, sr);
+  const src = off.createBufferSource();
+  src.buffer = buffer;
+  src.connect(off.destination);
+  src.start(0);
+  const out = await off.startRendering();
+  return out.getChannelData(0).slice();
+}
+
+/* WSOLA time stretch. Stretch by S, then play back at S, and you get the
+   original duration at a shifted pitch. The correlation search is what
+   keeps it from sounding like a warbling mess. */
+function timeStretch(input, ratio){
+  const N = 1024;
+  const Hs = N >> 2;
+  const Ha = Math.max(1, Math.round(Hs / ratio));
+  const search = N >> 3;
+  const ovl = N - Hs;
+  const outLen = Math.ceil(input.length * ratio) + N * 2;
+  const out = new Float32Array(outLen);
+
+  const win = new Float32Array(N);
+  for (let i = 0; i < N; i++) win[i] = 0.5 - 0.5 * Math.cos(2 * Math.PI * i / N);
+
+  let inPos = 0, outPos = 0;
+
+  while (inPos + N + search < input.length && outPos + N < outLen){
+    let off = 0;
+    if (outPos > 0){
+      let best = -Infinity;
+      for (let o = -search; o <= search; o += 6){
+        const st = inPos + o;
+        if (st < 0 || st + ovl >= input.length) continue;
+        let acc = 0;
+        for (let i = 0; i < ovl; i += 6) acc += out[outPos + i] * input[st + i];
+        if (acc > best){ best = acc; off = o; }
+      }
+    }
+    const st = inPos + off;
+    for (let i = 0; i < N; i++){
+      const si = st + i;
+      if (si >= 0 && si < input.length) out[outPos + i] += input[si] * win[i];
+    }
+    inPos += Ha;
+    outPos += Hs;
+  }
+
+  const used = out.subarray(0, Math.min(outPos + N, outLen));
+  let peak = 0;
+  for (let i = 0; i < used.length; i++){ const v = Math.abs(used[i]); if (v > peak) peak = v; }
+  const gain = peak > 0 ? 0.92 / peak : 1;
+  const res = new Float32Array(used.length);
+  for (let i = 0; i < used.length; i++) res[i] = used[i] * gain;
+  return res;
+}
+
+function driveCurve(amount){
+  const n = 1024, c = new Float32Array(n), k = amount * 60;
+  for (let i = 0; i < n; i++){
+    const x = i * 2 / n - 1;
+    c[i] = (1 + k) * x / (1 + k * Math.abs(x));
+  }
+  return c;
+}
+
+async function renderVoice(voice){
+  const sr = CONFIG.workRate;
+  const len = S.origLen;
+  const off = new OfflineAudioContext(1, len, sr);
+
+  const hp = off.createBiquadFilter();
+  hp.type = 'highpass'; hp.frequency.value = voice.hp;
+
+  const pk = off.createBiquadFilter();
+  pk.type = 'peaking'; pk.frequency.value = voice.peak[0];
+  pk.gain.value = voice.peak[1]; pk.Q.value = 1.1;
+
+  const lp = off.createBiquadFilter();
+  lp.type = 'lowpass'; lp.frequency.value = voice.lp;
+
+  const sh = off.createWaveShaper();
+  sh.curve = driveCurve(voice.drive);
+  sh.oversample = '2x';
+
+  const out = off.createGain();
+  out.gain.value = 0.86;
+
+  hp.connect(pk); pk.connect(lp); lp.connect(sh); sh.connect(out);
+  out.connect(off.destination);
+
+  for (const layer of voice.layers){
+    const data = timeStretch(S.monoWork, layer.ratio);
+    const b = off.createBuffer(1, data.length, sr);
+    b.copyToChannel(data, 0);
+    const src = off.createBufferSource();
+    src.buffer = b;
+    src.playbackRate.value = layer.ratio;
+    const g = off.createGain();
+    g.gain.value = layer.gain;
+    src.connect(g); g.connect(hp);
+    src.start(layer.delay || 0);
+  }
+
+  // room tone, so the silences aren't suspiciously clean
+  if (voice.hiss > 0){
+    const nb = off.createBuffer(1, len, sr);
+    const nd = nb.getChannelData(0);
+    for (let i = 0; i < len; i++) nd[i] = (Math.random() * 2 - 1);
+    const ns = off.createBufferSource();
+    ns.buffer = nb;
+    const ng = off.createGain();
+    ng.gain.value = voice.hiss;
+    const nf = off.createBiquadFilter();
+    nf.type = 'bandpass'; nf.frequency.value = 1800; nf.Q.value = 0.5;
+    ns.connect(nf); nf.connect(ng); ng.connect(off.destination);
+    ns.start(0);
+  }
+
+  return off.startRendering();
+}
+
+async function applyVoice(idx, firstTime){
+  S.voiceIdx = idx;
+  const voice = VOICES[idx];
+  setStep('working');
+  setHint('Fitting the ' + voice.name.toLowerCase() + ' voice.');
+  renderVoiceButtons();
+
+  await new Promise(r => setTimeout(r, 30)); // let the paint land
+  const buf = await renderVoice(voice);
+
+  S.maskedBuffer = buf;
+  S.maskedBlob = new Blob([encodeWav(buf)], { type: 'audio/wav' });
+  S.audioEl.src = URL.createObjectURL(S.maskedBlob);
+
+  const newEnv = envelopeOf(buf.getChannelData(0), barCount());
+  morphScope(
+    firstTime ? S.origEnv : scopeState.env,
+    newEnv,
+    firstTime ? PAL_RAW : PAL_MASKED,
+    PAL_MASKED,
+    firstTime ? 1300 : 600,
+    () => {
+      setStep('review');
+      setHint('That is the voice the room will hear. Not yours any more.');
+    }
+  );
+}
+
+function encodeWav(buffer){
+  const d = buffer.getChannelData(0);
+  const sr = buffer.sampleRate;
+  const ab = new ArrayBuffer(44 + d.length * 2);
+  const v = new DataView(ab);
+  const str = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+  str(0,'RIFF'); v.setUint32(4, 36 + d.length*2, true); str(8,'WAVE');
+  str(12,'fmt '); v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,1,true);
+  v.setUint32(24,sr,true); v.setUint32(28,sr*2,true); v.setUint16(32,2,true); v.setUint16(34,16,true);
+  str(36,'data'); v.setUint32(40, d.length*2, true);
+  let o = 44;
+  for (let i = 0; i < d.length; i++, o += 2){
+    const s = Math.max(-1, Math.min(1, d[i]));
+    v.setInt16(o, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+  }
+  return ab;
+}
+
+/* ============================================================
+   SENDING
+   ============================================================ */
+
+async function send(kind){
+  const btn = kind === 'text' ? $('btnSendText') : $('btnSend');
+  btn.disabled = true;
+  btn.textContent = 'Sending';
+
+  const ref = refCode();
+  let ok = true;
+
+  if (CONFIG.endpoint){
+    try {
+      const fd = new FormData();
+      fd.append('kind', kind);
+      fd.append('ref', ref);
+      if (kind === 'voice'){
+        fd.append('audio', S.maskedBlob, ref + '.wav');
+        fd.append('voice', VOICES[S.voiceIdx].id);
+      } else {
+        fd.append('text', $('story').value.trim());
+      }
+      const res = await fetch(CONFIG.endpoint, { method:'POST', body: fd });
+      ok = res.ok;
+    } catch(e){ ok = false; }
+  }
+
+  if (!ok){
+    btn.disabled = false;
+    btn.textContent = 'Send anonymously';
+    return fail("That didn't go through. Check your connection and try again.");
+  }
+
+  $('voicePath').hidden = true;
+  $('receipt').hidden = false;
+  $('receiptId').textContent = 'REF ' + ref;
+  $('receiptBody').textContent = kind === 'voice'
+    ? 'Your story is with us in a voice that is not yours. If it becomes a film, that is the voice people will hear.'
+    : 'Your story is with us. We kept nothing that points back to you.';
+
+  if (kind === 'voice' && S.maskedBlob){
+    const a = $('btnSave');
+    a.href = URL.createObjectURL(S.maskedBlob);
+    a.download = ref + '.wav';
+    a.hidden = false;
+  }
+  setStep('sent');
+}
+
+function refCode(){
+  const c = 'ACDEFHJKLMNPRTVWXY3479';
+  let s = '';
+  for (let i = 0; i < 6; i++) s += c[Math.floor(Math.random() * c.length)];
+  return s.slice(0,3) + '-' + s.slice(3);
+}
+
+/* ============================================================
+   UI PLUMBING
+   ============================================================ */
+
+const LABELS = {
+  idle:      ['Ready', 'No one is listening yet'],
+  recording: ['Recording', 'Recording'],
+  working:   ['Working', 'Changing your voice'],
+  review:    ['Masked', 'Yours to send or scrap'],
+  sent:      ['Sent', 'Received']
+};
+
+function setStep(step){
+  S.step = step;
+  document.body.dataset.step = step;
+  $('stateLabel').textContent = LABELS[step][0];
+  $('stripStatus').textContent = LABELS[step][1];
+
+  $('ctlIdle').hidden      = step !== 'idle';
+  $('ctlRecording').hidden = step !== 'recording';
+  $('ctlReview').hidden    = step !== 'review';
+
+  if (step === 'idle'){
+    $('clock').textContent = '0:00';
+    $('clock').classList.remove('warn');
+    setScope(null, PAL_REST, 0, 0);
+  }
+  if (step === 'working'){
+    $('btnPlay').textContent = 'Play it back';
+  }
+}
+
+function setHint(text, alert){
+  const h = $('hint');
+  h.textContent = text;
+  h.classList.toggle('alert', !!alert);
+}
+function fail(msg){ setHint(msg, true); }
+
+function fmt(s){ return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); }
+
+function renderVoiceButtons(){
+  const wrap = $('voices');
+  wrap.innerHTML = '';
+  VOICES.forEach((v, i) => {
+    const b = document.createElement('button');
+    b.className = 'voice';
+    b.textContent = v.name;
+    b.setAttribute('aria-pressed', i === S.voiceIdx ? 'true' : 'false');
+    b.onclick = () => { if (i !== S.voiceIdx && S.step === 'review'){ S.audioEl.pause(); applyVoice(i, false); } };
+    wrap.appendChild(b);
+  });
+}
+
+function resetAll(){
+  S.audioEl.pause();
+  S.monoWork = null; S.maskedBuffer = null; S.maskedBlob = null;
+  S.origEnv = null; S.chunks = [];
+  $('btnSend').disabled = false; $('btnSend').textContent = 'Send anonymously';
+  $('btnSendText').disabled = false; $('btnSendText').textContent = 'Send anonymously';
+  $('story').value = '';
+  $('btnSave').hidden = true;
+  $('receipt').hidden = true;
+  $('voicePath').hidden = false;
+  setStep('idle');
+  setHint('Find somewhere quiet. Up to ' + CONFIG.maxSeconds + ' seconds is plenty.');
+}
+
+/* events */
+$('btnRecord').onclick = startRecording;
+$('btnStop').onclick   = stopRecording;
+$('btnRedo').onclick   = resetAll;
+$('btnAnother').onclick = resetAll;
+$('btnSend').onclick   = () => send('voice');
+
+$('btnPlay').onclick = () => {
+  if (!S.audioEl.src) return;
+  if (S.audioEl.paused){ S.audioEl.play(); $('btnPlay').textContent = 'Pause'; }
+  else { S.audioEl.pause(); $('btnPlay').textContent = 'Play it back'; }
+};
+S.audioEl.onended = () => { $('btnPlay').textContent = 'Play it back'; };
+
+$('altToggle').onclick = () => {
+  const p = $('altPanel');
+  const open = p.hidden;
+  p.hidden = !open;
+  $('altToggle').setAttribute('aria-expanded', String(open));
+  $('altToggle').textContent = open ? 'Go back to recording' : 'Rather type it than say it?';
+  if (open) $('story').focus();
+};
+
+$('btnSendText').onclick = () => {
+  if ($('story').value.trim().length < 10) return fail('Write a little more first.');
+  send('text');
+};
+
+fitScope();
+setHint('Find somewhere quiet. Up to ' + CONFIG.maxSeconds + ' seconds is plenty.');
+</script>
+</body>
+</html>

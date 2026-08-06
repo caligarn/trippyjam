@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Open Line — The Line So Far</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* printed psychedelia, not neon. oxidised inks on warm stock. */
+    --field:#170E22;
+    --line:#4A2E5E;
+    --paper:#FFEBC7;
+    --dim:#B49BC8;
+    --signal:#FF2E88;
+    --mask:#8CFF4A;
+    --marigold:#FFB020;
+    --cyan:#2FE3E3;
+
+    --display:"Bricolage Grotesque","Helvetica Neue",Helvetica,Arial,sans-serif;
+    --body:"Instrument Sans",ui-sans-serif,system-ui,-apple-system,sans-serif;
+    --mono:"DM Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+
+  html,body{height:100%}
+
+  body{
+    background:var(--field);
+    color:var(--paper);
+    font-family:var(--body);
+    font-size:16px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    display:flex;
+    justify-content:center;
+    padding:clamp(20px,5vw,56px) clamp(18px,5vw,32px) 64px;
+  }
+
+  /* riso grain, sits over everything */
+  body::after{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:3;
+    opacity:.22;
+    mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* four inks bleeding into each other, slowly, like wet offset */
+  .aurora{
+    position:fixed;
+    inset:-25%;
+    z-index:0;
+    pointer-events:none;
+    filter:blur(70px);
+    opacity:.5;
+  }
+  .aurora i{
+    position:absolute;
+    display:block;
+    border-radius:50%;
+    mix-blend-mode:screen;
+  }
+  .aurora i:nth-child(1){width:56vmax;height:56vmax;left:-8%;top:-4%;
+    background:radial-gradient(circle,#FF2E88,transparent 66%);animation:drift1 34s ease-in-out infinite}
+  .aurora i:nth-child(2){width:50vmax;height:50vmax;right:-10%;top:8%;
+    background:radial-gradient(circle,#2FE3E3,transparent 64%);animation:drift2 41s ease-in-out infinite}
+  .aurora i:nth-child(3){width:62vmax;height:62vmax;left:12%;bottom:-16%;
+    background:radial-gradient(circle,#8CFF4A,transparent 62%);animation:drift3 47s ease-in-out infinite}
+  .aurora i:nth-child(4){width:44vmax;height:44vmax;right:4%;bottom:-4%;
+    background:radial-gradient(circle,#FFB020,transparent 66%);animation:drift1 38s ease-in-out infinite reverse}
+
+  @keyframes drift1{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(12vw,8vh) scale(1.18)}66%{transform:translate(-6vw,14vh) scale(.9)}}
+  @keyframes drift2{0%,100%{transform:translate(0,0) scale(1.05)}50%{transform:translate(-14vw,10vh) scale(.85)}}
+  @keyframes drift3{0%,100%{transform:translate(0,0) scale(.95)}40%{transform:translate(10vw,-10vh) scale(1.2)}75%{transform:translate(-8vw,-4vh) scale(1)}}
+
+  .shell{
+    position:relative;
+    z-index:2;
+    width:100%;
+    max-width:560px;
+    display:flex;
+    flex-direction:column;
+    gap:clamp(28px,5vw,40px);
+  }
+
+  /* ---------- masthead ---------- */
+
+  .masthead{display:flex;flex-direction:column;gap:18px}
+
+  .strip{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--dim);
+  }
+  .strip .rule{flex:1;height:1px;background:var(--line)}
+
+  .lamp{
+    width:7px;height:7px;border-radius:50%;
+    background:var(--line);
+    transition:background .3s, box-shadow .3s;
+  }
+  body[data-playing="true"] .lamp{background:var(--mask);box-shadow:0 0 10px var(--mask);animation:pulse 1.15s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+  h1{
+    font-family:var(--display);
+    font-weight:800;
+    font-size:clamp(34px,8.5vw,54px);
+    line-height:1.02;
+    letter-spacing:-.028em;
+    text-wrap:balance;
+    /* plates that never quite line up */
+    text-shadow:
+      .022em .018em 0 rgba(255,46,136,.85),
+      -.02em -.014em 0 rgba(47,227,227,.75),
+      .006em -.024em 0 rgba(255,176,32,.55);
+  }
+  h1 .turn{display:block;color:var(--marigold);text-shadow:
+      .022em .018em 0 rgba(140,255,74,.7),
+      -.02em -.014em 0 rgba(255,46,136,.6);}
+
+  .standfirst{
+    color:var(--dim);
+    font-size:clamp(15px,3.6vw,17px);
+    max-width:44ch;
+  }
+  .standfirst strong{color:var(--paper);font-weight:500}
+
+  /* ---------- call cards ---------- */
+
+  .calls{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+  }
+
+  .call{
+    border:1px solid var(--line);
+    background:linear-gradient(180deg,rgba(34,20,49,.86),rgba(23,14,34,.92));
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    border-radius:3px;
+    overflow:hidden;
+    transition:box-shadow .25s, border-color .25s;
+  }
+  .call[data-live="true"]{
+    border-color:rgba(255,46,136,.5);
+    box-shadow:0 0 0 1px rgba(255,46,136,.14), 0 24px 70px -30px rgba(255,46,136,.5);
+  }
+
+  .call-head{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:12px 16px;
+    border-bottom:1px solid var(--line);
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+  }
+  .call-head .ref{color:var(--marigold);letter-spacing:.22em}
+  .call-head .spacer{flex:1}
+  .call-head .len{color:var(--paper);font-variant-numeric:tabular-nums}
+  .call[data-live="true"] .len{color:var(--signal)}
+
+  .chip{
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:.1em;
+    padding:3px 8px;
+    border:1px solid var(--vc,var(--line));
+    border-radius:2px;
+    color:var(--vc,var(--dim));
+    background:color-mix(in srgb,var(--vc,transparent) 12%,transparent);
+  }
+
+  .call-body{
+    display:flex;
+    align-items:stretch;
+  }
+
+  .btn-play{
+    flex:0 0 64px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:transparent;
+    border:none;
+    border-right:1px solid var(--line);
+    color:var(--paper);
+    cursor:pointer;
+    transition:background .16s;
+  }
+  .btn-play:hover{background:rgba(255,255,255,.05)}
+  .btn-play:focus-visible{outline:2px solid var(--marigold);outline-offset:-3px}
+  .btn-play svg{display:block;width:20px;height:20px;fill:currentColor}
+  .call[data-live="true"] .btn-play{color:var(--signal)}
+
+  .wave{
+    flex:1;
+    min-width:0;
+    display:block;
+    height:92px;
+    cursor:pointer;
+    background:
+      radial-gradient(130% 150% at 50% 50%,rgba(255,46,136,.06),transparent 64%),
+      rgba(12,6,20,.55);
+  }
+
+  .call-foot{
+    display:flex;
+    align-items:baseline;
+    gap:12px;
+    padding:10px 16px;
+    border-top:1px solid var(--line);
+  }
+  .call-foot .when{
+    font-family:var(--mono);
+    font-size:10.5px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:#8E76A4;
+    white-space:nowrap;
+  }
+  .call-foot .note{
+    font-size:13px;
+    color:var(--dim);
+  }
+
+  /* ---------- states ---------- */
+
+  .empty,.errored{
+    border:1px dashed var(--line);
+    border-radius:3px;
+    padding:34px 22px;
+    text-align:center;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .empty h2,.errored h2{
+    font-family:var(--display);
+    font-weight:700;
+    font-size:20px;
+    letter-spacing:-.01em;
+  }
+  .empty p,.errored p{color:var(--dim);font-size:14.5px}
+
+  .caution{
+    font-family:var(--mono);
+    font-size:11.5px;
+    letter-spacing:.05em;
+    color:#8E76A4;
+  }
+
+  .linkbtn{
+    display:block;
+    text-align:center;
+    text-decoration:none;
+    font-family:var(--body);
+    font-size:15px;
+    font-weight:500;
+    border-radius:2px;
+    padding:14px 18px;
+    background:linear-gradient(96deg,var(--marigold),var(--signal) 46%,#9B4DFF 78%,var(--cyan));
+    color:#160B20;
+    font-weight:700;
+    letter-spacing:.01em;
+    transition:filter .16s;
+  }
+  .linkbtn:hover{filter:brightness(1.12) saturate(1.1)}
+  .linkbtn:focus-visible{outline:2px solid var(--marigold);outline-offset:2px}
+
+  a{color:var(--cyan);text-underline-offset:3px}
+
+  .colophon{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.08em;
+    color:#8E76A4;
+    line-height:1.9;
+  }
+
+  [hidden]{display:none !important}
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none !important;transition:none !important}
+    .aurora{opacity:.38}
+  }
+</style>
+</head>
+<body data-playing="false">
+
+<div class="aurora" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+
+<main class="shell">
+
+  <header class="masthead">
+    <div class="strip">
+      <span class="lamp" aria-hidden="true"></span>
+      <span>Machine Cinema</span>
+      <span class="rule" aria-hidden="true"></span>
+      <span id="stripStatus">Nothing playing</span>
+    </div>
+
+    <h1>The line so far.<span class="turn">Nobody sounds like themselves.</span></h1>
+
+    <p class="standfirst">
+      Every story here arrived through <a href="index.html">Open Line</a>, already
+      masked. These are the voices the room hears at a GenJam — a reference code,
+      a borrowed voice, and <strong>whatever they needed to say.</strong>
+    </p>
+  </header>
+
+  <section class="calls" id="calls" aria-label="Submitted recordings">
+    <!-- populated from gallery/manifest.json -->
+  </section>
+
+  <p class="caution">If one of these is yours and you want it gone, send us the reference code. No questions.</p>
+
+  <a class="linkbtn" href="index.html">Leave yours &rarr;</a>
+
+  <p class="colophon">
+    A Machine Cinema project. Masking runs in the storyteller's browser.<br>
+    No account, no cookie, no caller ID. We're after the story, not the substance.
+  </p>
+
+</main>
+
+<script>
+/* ============================================================
+   CONFIG
+   ============================================================ */
+
+const MANIFEST = 'gallery/manifest.json';
+
+/* entry file paths are relative to the manifest, not the page */
+const fileURL = f => new URL(f, new URL(MANIFEST, location.href)).href;
+
+/* voice id -> chip colour, mirrors the picker on index.html */
+const VOICE_COLORS = {
+  cellar:      '#FF2E88',
+  kite:        '#FFB020',
+  switchboard: '#2FE3E3',
+  crowd:       '#8CFF4A'
+};
+
+/* masked palette, same spectrum the console lands on after masking */
+const PAL = { h: 8, spread: 4.4, sat: 90, lum: 63 };
+
+/* ============================================================
+   STATE
+   ============================================================ */
+
+const cards = [];        // { el, canvas, g2d, audio, env, entry, btn }
+let liveCard = null;
+let raf = null;
+let sharedCtx = null;
+
+const $ = sel => document.querySelector(sel);
+
+function fmt(s){
+  s = Math.max(0, Math.round(s));
+  return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+}
+
+/* ============================================================
+   WAVEFORMS
+   ============================================================ */
+
+function envelopeOf(data, n){
+  const out = new Float32Array(n);
+  const per = Math.max(1, Math.floor(data.length / n));
+  let peak = 0;
+  for (let i = 0; i < n; i++){
+    let m = 0;
+    const s = i * per, e = Math.min(data.length, s + per);
+    for (let j = s; j < e; j += 3){ const v = Math.abs(data[j]); if (v > m) m = v; }
+    out[i] = m;
+    if (m > peak) peak = m;
+  }
+  if (peak > 0) for (let i = 0; i < n; i++) out[i] /= peak;
+  return out;
+}
+
+function barCount(canvas){
+  return Math.max(36, Math.min(96, Math.floor(canvas.getBoundingClientRect().width / 6)));
+}
+
+function fitCanvas(card){
+  const r = card.canvas.getBoundingClientRect();
+  const d = window.devicePixelRatio || 1;
+  card.canvas.width = Math.max(1, Math.round(r.width * d));
+  card.canvas.height = Math.max(1, Math.round(r.height * d));
+  card.g2d.setTransform(d, 0, 0, d, 0, 0);
+}
+
+function drawCard(card, progress){
+  const w = card.canvas.getBoundingClientRect().width;
+  const h = card.canvas.getBoundingClientRect().height;
+  const g = card.g2d;
+  g.clearRect(0, 0, w, h);
+
+  const mid = h / 2;
+  g.strokeStyle = '#4A2E5E';
+  g.lineWidth = 1;
+  g.beginPath();
+  g.moveTo(0, mid + .5);
+  g.lineTo(w, mid + .5);
+  g.stroke();
+
+  const env = card.env;
+  if (!env) return;
+
+  const n = env.length;
+  const gap = 3;
+  const bw = Math.max(2, (w - gap * (n - 1)) / n);
+  const playedUpTo = progress * n;
+
+  for (let i = 0; i < n; i++){
+    const a = Math.max(0.012, Math.min(1, env[i]));
+    const bh = a * (h * 0.84);
+    const x = i * (bw + gap);
+    const hue = (PAL.h + i * PAL.spread * (360 / n)) % 360;
+    const played = i < playedUpTo;
+    const col = played
+      ? `hsl(${hue.toFixed(1)} ${PAL.sat}% ${PAL.lum}%)`
+      : `hsl(${hue.toFixed(1)} ${PAL.sat * .38}% ${PAL.lum * .62}% / .8)`;
+    if (played){
+      g.shadowBlur = 8;
+      g.shadowColor = col;
+    } else {
+      g.shadowBlur = 0;
+    }
+    g.fillStyle = col;
+    g.fillRect(x, mid - bh / 2, bw, bh);
+  }
+  g.shadowBlur = 0;
+}
+
+async function loadWave(card){
+  try {
+    const res = await fetch(fileURL(card.entry.file));
+    if (!res.ok) throw new Error(res.status);
+    const raw = await res.arrayBuffer();
+    sharedCtx = sharedCtx || new (window.AudioContext || window.webkitAudioContext)();
+    const buf = await sharedCtx.decodeAudioData(raw);
+    card.pcm = buf.getChannelData(0);
+    card.env = envelopeOf(card.pcm, barCount(card.canvas));
+    card.duration = buf.duration;
+    card.el.querySelector('.len').textContent = fmt(buf.duration);
+    drawCard(card, 0);
+  } catch (e){
+    /* keep the card, keep the baseline; the <audio> element may still play it */
+    console.warn('waveform unavailable for', card.entry.file, e);
+  }
+}
+
+/* ============================================================
+   PLAYBACK  (one call at a time)
+   ============================================================ */
+
+const ICON_PLAY  = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 3.4v13.2c0 .8.9 1.3 1.6.9l10.4-6.6c.6-.4.6-1.4 0-1.8L6.6 2.5c-.7-.4-1.6.1-1.6.9z"/></svg>';
+const ICON_PAUSE = '<svg viewBox="0 0 20 20" aria-hidden="true"><rect x="4" y="3" width="4.4" height="14" rx="1"/><rect x="11.6" y="3" width="4.4" height="14" rx="1"/></svg>';
+
+function setLive(card){
+  if (liveCard && liveCard !== card){
+    liveCard.audio.pause();
+    paint(liveCard);
+  }
+  liveCard = card;
+  document.body.dataset.playing = card ? 'true' : 'false';
+  $('#stripStatus').textContent = card ? 'Playing ' + card.entry.ref : 'Nothing playing';
+  cards.forEach(c => c.el.dataset.live = String(c === card));
+}
+
+function paint(card){
+  const d = card.duration || card.audio.duration || 0;
+  const p = d ? card.audio.currentTime / d : 0;
+  drawCard(card, p);
+  card.btn.innerHTML = card.audio.paused ? ICON_PLAY : ICON_PAUSE;
+  card.btn.setAttribute('aria-label', (card.audio.paused ? 'Play ' : 'Pause ') + card.entry.ref);
+}
+
+function tick(){
+  if (liveCard && !liveCard.audio.paused){
+    paint(liveCard);
+    raf = requestAnimationFrame(tick);
+  }
+}
+
+function toggle(card){
+  if (card.audio.paused){
+    setLive(card);
+    card.audio.play().then(() => {
+      paint(card);
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(tick);
+    }).catch(() => {
+      card.el.querySelector('.note').textContent = "Couldn't play this one. Serve the site over http and try again.";
+    });
+  } else {
+    card.audio.pause();
+    paint(card);
+  }
+}
+
+function seek(card, ev){
+  const r = card.canvas.getBoundingClientRect();
+  const p = Math.max(0, Math.min(1, (ev.clientX - r.left) / r.width));
+  const d = card.duration || card.audio.duration;
+  if (!d) return;
+  card.audio.currentTime = p * d;
+  paint(card);
+  if (card.audio.paused) toggle(card);
+}
+
+/* ============================================================
+   BUILD
+   ============================================================ */
+
+function buildCard(entry){
+  const el = document.createElement('article');
+  el.className = 'call';
+  el.dataset.live = 'false';
+
+  const vc = VOICE_COLORS[entry.voice] || '#B49BC8';
+  const when = entry.added
+    ? new Date(entry.added + 'T00:00:00').toLocaleDateString(undefined, { day:'numeric', month:'short' })
+    : '';
+
+  el.innerHTML =
+    '<div class="call-head">' +
+      '<span class="ref">REF ' + entry.ref + '</span>' +
+      '<span class="chip" style="--vc:' + vc + '">' + entry.voice + '</span>' +
+      '<span class="spacer"></span>' +
+      '<span class="len">&ndash;:&ndash;&ndash;</span>' +
+    '</div>' +
+    '<div class="call-body">' +
+      '<button class="btn-play">' + ICON_PLAY + '</button>' +
+      '<canvas class="wave"></canvas>' +
+    '</div>' +
+    '<div class="call-foot">' +
+      (when ? '<span class="when">' + when + '</span>' : '') +
+      '<span class="note">' + (entry.note || '') + '</span>' +
+    '</div>';
+
+  const card = {
+    el,
+    entry,
+    canvas: el.querySelector('.wave'),
+    g2d: el.querySelector('.wave').getContext('2d'),
+    btn: el.querySelector('.btn-play'),
+    audio: new Audio(fileURL(entry.file)),
+    env: null,
+    duration: 0
+  };
+  card.audio.preload = 'metadata';
+  card.audio.onloadedmetadata = () => {
+    if (!card.duration && isFinite(card.audio.duration)){
+      el.querySelector('.len').textContent = fmt(card.audio.duration);
+    }
+  };
+  card.audio.onended = () => { paint(card); setLive(null); };
+  card.audio.onpause = () => paint(card);
+
+  card.btn.onclick = () => toggle(card);
+  card.canvas.onclick = ev => seek(card, ev);
+
+  return card;
+}
+
+function showEmpty(){
+  $('#calls').innerHTML =
+    '<div class="empty">' +
+      '<h2>Nothing on the line yet.</h2>' +
+      '<p>The first stories are still on their way. Yours could be the one that opens it.</p>' +
+    '</div>';
+}
+
+function showError(){
+  $('#calls').innerHTML =
+    '<div class="errored">' +
+      '<h2>The line is quiet.</h2>' +
+      '<p>Couldn\'t reach the archive. If you\'re opening this file directly, serve the site over http instead.</p>' +
+    '</div>';
+}
+
+async function init(){
+  let manifest;
+  try {
+    const res = await fetch(MANIFEST, { cache: 'no-cache' });
+    if (!res.ok) throw new Error(res.status);
+    manifest = await res.json();
+  } catch (e){
+    console.warn(e);
+    return showError();
+  }
+
+  const entries = (manifest.calls || []).filter(c => c && c.file && c.ref);
+  if (!entries.length) return showEmpty();
+
+  const holder = $('#calls');
+  for (const entry of entries){
+    const card = buildCard(entry);
+    cards.push(card);
+    holder.appendChild(card.el);
+  }
+
+  /* size canvases now that they're in the layout, then decode waveforms */
+  cards.forEach(card => { fitCanvas(card); drawCard(card, 0); });
+  cards.forEach(loadWave);
+}
+
+window.addEventListener('resize', () => {
+  cards.forEach(card => {
+    fitCanvas(card);
+    if (card.pcm) card.env = envelopeOf(card.pcm, barCount(card.canvas));
+    const d = card.duration || card.audio.duration || 0;
+    drawCard(card, d ? card.audio.currentTime / d : 0);
+  });
+});
+
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+{
+  "calls": [
+    {
+      "file": "audio/HRD-C7A.wav",
+      "ref": "HRD-C7A",
+      "voice": "switchboard",
+      "added": "2026-08-02",
+      "note": "Demo call. Synthesized placeholder, not a real submission.",
+      "demo": true
+    },
+    {
+      "file": "audio/ELM-R47.wav",
+      "ref": "ELM-R47",
+      "voice": "cellar",
+      "added": "2026-07-30",
+      "note": "Demo call. Synthesized placeholder, not a real submission.",
+      "demo": true
+    },
+    {
+      "file": "audio/NVA-3XL.wav",
+      "ref": "NVA-3XL",
+      "voice": "crowd",
+      "added": "2026-07-26",
+      "note": "Demo call. Synthesized placeholder, not a real submission.",
+      "demo": true
+    },
+    {
+      "file": "audio/KWT-9F3.wav",
+      "ref": "KWT-9F3",
+      "voice": "kite",
+      "added": "2026-07-21",
+      "note": "Demo call. Synthesized placeholder, not a real submission.",
+      "demo": true
+    }
+  ]
+}
