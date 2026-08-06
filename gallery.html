@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Open Line — The Line So Far</title>
+<link rel="icon" href="brand/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="brand/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -105,6 +107,9 @@
     color:var(--dim);
   }
   .strip .rule{flex:1;height:1px;background:var(--line)}
+
+  /* the wordmark sits in the strip at the size of the type it replaces */
+  .strip .brandmark{flex:0 0 auto;display:block;height:14px;width:auto}
 
   .lamp{
     width:7px;height:7px;border-radius:50%;
@@ -257,6 +262,7 @@
     font-size:20px;
     letter-spacing:-.01em;
   }
+  .empty img,.errored img{width:42px;height:auto;margin:0 auto 4px;opacity:.5}
   .empty p,.errored p{color:var(--dim);font-size:14.5px}
 
   .caution{
@@ -293,6 +299,8 @@
     color:#8E76A4;
     line-height:1.9;
   }
+  /* sign-off: quiet enough to sit under the colophon, not shout over it */
+  .signoff{display:block;width:96px;height:auto;opacity:.42;margin-bottom:16px}
 
   [hidden]{display:none !important}
 
@@ -311,7 +319,7 @@
   <header class="masthead">
     <div class="strip">
       <span class="lamp" aria-hidden="true"></span>
-      <span>Machine Cinema</span>
+      <img class="brandmark" src="brand/machine-cinema-horizontal.png" alt="Machine Cinema" width="811" height="181">
       <span class="rule" aria-hidden="true"></span>
       <span id="stripStatus">Nothing playing</span>
     </div>
@@ -333,10 +341,13 @@
 
   <a class="linkbtn" href="index.html">Leave yours &rarr;</a>
 
+  <div>
+  <img class="signoff" src="brand/machine-cinema-stacked.png" alt="Machine Cinema" width="461" height="284">
   <p class="colophon">
     A Machine Cinema project. Masking runs in the storyteller's browser.<br>
     No account, no cookie, no caller ID. We're after the story, not the substance.
   </p>
+  </div>
 
 </main>
 
@@ -586,6 +597,7 @@ function buildCard(entry){
 function showEmpty(){
   $('#calls').innerHTML =
     '<div class="empty">' +
+      '<img src="brand/machine-cinema-mark.png" alt="" aria-hidden="true">' +
       '<h2>Nothing on the line yet.</h2>' +
       '<p>The first stories are still on their way. Yours could be the one that opens it.</p>' +
     '</div>';
@@ -594,6 +606,7 @@ function showEmpty(){
 function showError(){
   $('#calls').innerHTML =
     '<div class="errored">' +
+      '<img src="brand/machine-cinema-mark.png" alt="" aria-hidden="true">' +
       '<h2>The line is quiet.</h2>' +
       '<p>Couldn\'t reach the archive. If you\'re opening this file directly, serve the site over http instead.</p>' +
     '</div>';

@@ -54,6 +54,24 @@ The four clips currently in `gallery/audio/` are **synthesized demo
 placeholders** (marked as such in their notes), not real submissions — replace
 them once real ones arrive.
 
+## Brand assets
+
+`brand/` holds the Machine Cinema logo set — white ink on transparent, which is
+what the dark field wants:
+
+| File | Lockup | Used on the site |
+| --- | --- | --- |
+| `machine-cinema-horizontal.png` | Camera + single-line wordmark | Masthead strip, both pages |
+| `machine-cinema-stacked.png` | Camera above wordmark | Footer sign-off, both pages |
+| `machine-cinema-mark.png` | Camera only | Receipt stamp, gallery empty/error state |
+| `machine-cinema-compact.png` | Camera + two-line wordmark | — (spare) |
+| `machine-cinema-compact-alt.png` | Two-line wordmark + camera | — (spare) |
+| `favicon.png` | Mark on the field colour | `<link rel="icon">`, both pages |
+
+The favicon is the only derived file: the mark composited onto `--field`
+(`#170E22`) so it stays visible against light browser chrome, where white ink on
+transparent would disappear.
+
 ## Collecting submissions
 
 `CONFIG.endpoint` in `index.html` is `null` by default, which runs the whole

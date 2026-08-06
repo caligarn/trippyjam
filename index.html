@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Open Line</title>
+<link rel="icon" href="brand/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="brand/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -107,6 +109,9 @@
     color:var(--dim);
   }
   .strip .rule{flex:1;height:1px;background:var(--line)}
+
+  /* the wordmark sits in the strip at the size of the type it replaces */
+  .strip .brandmark{flex:0 0 auto;display:block;height:14px;width:auto}
 
   .lamp{
     width:7px;height:7px;border-radius:50%;
@@ -458,7 +463,12 @@
     font-weight:700;
     font-size:24px;
     letter-spacing:-.02em;
+    display:flex;
+    align-items:center;
+    gap:12px;
   }
+  /* the mark stamps the receipt, like a till roll */
+  .receipt h2 img{width:28px;height:auto;flex:0 0 auto;opacity:.92}
   .receipt p{color:var(--dim);font-size:15px}
   .receipt .id{
     font-family:var(--mono);
@@ -476,6 +486,8 @@
     color:#8E76A4;
     line-height:1.9;
   }
+  /* sign-off: quiet enough to sit under the colophon, not shout over it */
+  .signoff{display:block;width:96px;height:auto;opacity:.42;margin-bottom:16px}
 
   [hidden]{display:none !important}
 
@@ -494,7 +506,7 @@
   <header class="masthead">
     <div class="strip">
       <span class="lamp" aria-hidden="true"></span>
-      <span>Machine Cinema</span>
+      <img class="brandmark" src="brand/machine-cinema-horizontal.png" alt="Machine Cinema" width="811" height="181">
       <span class="rule" aria-hidden="true"></span>
       <span id="stripStatus">No one is listening yet</span>
     </div>
@@ -703,7 +715,7 @@
 
   <!-- ============ RECEIPT ============ -->
   <section class="receipt" id="receipt" hidden>
-    <h2>Got it.</h2>
+    <h2><img src="brand/machine-cinema-mark.png" alt="" aria-hidden="true">Got it.</h2>
     <p id="receiptBody">Your story is with us and your name isn't attached to it.</p>
     <p class="id" id="receiptId"></p>
     <p style="font-size:13.5px">Write this down. It is the only way to ask for your story back, and it is the only thing connecting you to it.</p>
@@ -714,10 +726,13 @@
     </div>
   </section>
 
+  <div>
+  <img class="signoff" src="brand/machine-cinema-stacked.png" alt="Machine Cinema" width="461" height="284">
   <p class="colophon">
     A Machine Cinema project. Masking runs in your browser.<br>
     No account, no cookie, no caller ID. We're after the story, not the substance.
   </p>
+  </div>
 
 </main>
 
