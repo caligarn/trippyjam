@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Open Line</title>
+<title>TrippyJam</title>
 <link rel="icon" href="brand/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="brand/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -514,9 +514,9 @@
     <h1>Tell us what happened.<span class="turn">In a voice that isn't yours.</span></h1>
 
     <p class="standfirst">
-      We're running a series of GenJams: a room full of animators, one day, one
-      short film — each one animated to a stranger's psychedelic trip.
-      <strong>We need the trips.</strong>
+      TrippyJam is a series of online GenJams: animators from everywhere pile
+      into one call for a day and turn a stranger's psychedelic trip into a
+      short video. <strong>We need the trips.</strong>
     </p>
 
     <p class="standfirst">
@@ -536,7 +536,9 @@
     <div class="pact">
       <h2>What happens to it</h2>
       <p>
-        Open Line is run by the Machine Cinema community. The masked version is
+        TrippyJam is run by the Machine Cinema community. Your masked recording
+        becomes the soundtrack of a short video, animated live at an online
+        GenJam by people hearing it for the first time. That masked version is
         the only one anyone works from — the animators included. Your original
         audio never leaves your device, and we never learn who you are.
       </p>
@@ -1236,7 +1238,7 @@ async function send(kind){
   $('receipt').hidden = false;
   $('receiptId').textContent = 'REF ' + ref;
   $('receiptBody').textContent = kind === 'voice'
-    ? 'Your story is with us in a voice that is not yours. If it becomes a film, that is the voice people will hear.'
+    ? 'Your story is with us in a voice that is not yours. When it becomes a video at the next online GenJam, that is the voice people will hear.'
     : 'Your story is with us. We kept nothing that points back to you.';
 
   if (kind === 'voice' && S.maskedBlob){

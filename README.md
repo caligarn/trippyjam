@@ -1,10 +1,14 @@
-# Open Line
+# TrippyJam
 
 An anonymous voicemail line for the Machine Cinema community. People record a
-short story about a plant-medicine experience, the site masks their voice
+short story about a psychedelic experience, the site masks their voice
 **entirely in the browser**, they approve the masked version, and only then does
 anything leave their device. Each submission gets a reference code that can be
 used to withdraw it later, no questions asked.
+
+The collected audio is the raw material for a series of **online GenJams**:
+animators gather for a day, hear a masked story for the first time, and turn it
+into a short video.
 
 The site is fully static — no build step, no framework, no server-side code.
 
