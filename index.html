@@ -173,6 +173,30 @@
   .prompts li:nth-child(3)::before{background:#8CFF4A}
   .prompts li:nth-child(4)::before{background:#2FE3E3}
 
+  /* the conceit, said out loud */
+  .joke{
+    border-left:2px solid transparent;
+    border-image:linear-gradient(180deg,#FFB020,#E4572E 60%,#FF2E88) 1;
+    padding:2px 0 2px 16px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .joke h2{
+    font-family:var(--mono);
+    font-size:11px;
+    font-weight:500;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--oxide);
+  }
+  .joke p{
+    font-size:clamp(15px,3.6vw,17px);
+    color:var(--dim);
+    max-width:44ch;
+  }
+  .joke strong{color:var(--paper);font-weight:500}
+
   /* the two ways in: leave a story, or come and animate one */
   .paths{
     display:grid;
@@ -549,17 +573,28 @@
       <span id="stripStatus">No one is listening yet</span>
     </div>
 
-    <h1>We're running an experiment.<span class="turn">You tell it. AI animates it.</span></h1>
+    <h1>We're running an experiment.<span class="turn">You tell it. Artists animate it.</span></h1>
 
     <p class="standfirst">
-      Here's the whole idea: get people to share the story of a trip, then hand
-      those stories to filmmakers working with AI and see what comes back as
-      animation. Nobody has done this with strangers' voices before, so we're
-      finding out in public. <strong>TrippyJam is a Machine Cinema project.</strong>
+      Here's the whole idea: get people to share the story of a trip, then put
+      it in the hands of <strong>AI filmmakers and artists</strong> who animate
+      it. Real people making every call — what it looks like, what it withholds,
+      where it goes when the words run out. The machines are brushes. Nobody has
+      done this with strangers' voices before, so we're finding out in public.
     </p>
 
+    <div class="joke">
+      <h2>And the good part</h2>
+      <p>
+        AI hallucinates. That's usually the complaint. Here it's the whole
+        point: <strong>we're using hallucinating machines to animate
+        hallucinations</strong> — pointed by artists who know exactly when to
+        let the thing slip.
+      </p>
+    </div>
+
     <p class="standfirst">
-      There are two ways into it — bring a trip, or bring the tools to animate
+      There are two ways into it — bring a trip, or bring the hands to animate
       one.
     </p>
 
@@ -574,17 +609,19 @@
         </p>
         <p>
           Rather not talk? Write it out for us instead — there's a box for that
-          under the recorder. Either way, we take it from there and interpret it.
+          under the recorder. Either way, an artist takes it from there and
+          interprets it.
         </p>
         <p class="when">Open now &middot; scroll down</p>
       </div>
 
       <div class="path">
-        <h2>If you're an AI filmmaker</h2>
+        <h2>If you're an AI filmmaker or artist</h2>
         <p>
-          <strong>Get ready for the GenJam.</strong> Later in September,
-          animators pile into one online call for a day, hear these stories for
-          the first time, and turn them into short films.
+          <strong>Get ready for the GenJam.</strong> Later in September, we pile
+          into one online call for a day, hear these stories for the first time,
+          and animate them. Your eye, your taste, your cut — the model just does
+          what you tell it.
         </p>
         <p>
           Bring whatever you make with. Dates, the call link and the story pack
@@ -611,11 +648,10 @@
       <h2>What happens to it</h2>
       <p>
         TrippyJam is run by the Machine Cinema community. Your masked recording
-        becomes the soundtrack of a short animated film, made with AI at an
-        online GenJam by people hearing it for the first time. That masked
-        version is the only one anyone works from — the filmmakers included.
-        Your original audio never leaves your device, and we never learn who
-        you are.
+        becomes the soundtrack of a short film, animated by artists working with
+        AI at an online GenJam, hearing it for the first time. That masked
+        version is the only one anyone works from — the artists included. Your
+        original audio never leaves your device, and we never learn who you are.
       </p>
       <p>
         Every submission gets a reference code. Keep it and you can have your story
